@@ -22,7 +22,7 @@ public class ProducerService {
     @Value("${app.kafka.topics.raw}")
     private String rawTopic;
 
-    private static final String path = "src/main/resources/data/accidents.csv";
+    private static final String path = "./data/accidents.csv";
 
     public ProducerService(KafkaProducer kafkaProducer) {
         this.kafkaProducer = kafkaProducer;

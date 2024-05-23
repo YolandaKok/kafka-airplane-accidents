@@ -11,7 +11,7 @@ public class CsvParserTest {
 
     @Test
     public void test() {
-        String path = "src/test/resources/accidents.csv";
+        String path = "../data/accidents.csv";
         List<Accident> accidents = csvParser.readFile(path);
 
         Assertions.assertEquals("DELTA AIR LINES", accidents.getFirst().getOperator());
