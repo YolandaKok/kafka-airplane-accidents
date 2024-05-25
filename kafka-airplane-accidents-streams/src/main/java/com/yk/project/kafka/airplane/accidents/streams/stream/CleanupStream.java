@@ -22,14 +22,18 @@ public class CleanupStream {
     private String cleanupTopic;
 
     @Bean
-    public KStream<Long, Accident> streamFilterLargeDonations(StreamsBuilder builder) {
+    public KStream<Long, Accident> streamFilterEmptySpeciesNameAndQuantity(StreamsBuilder builder) {
         var accidentSerde = new JsonSerde<>(Accident.class);
 
         var cleanUpStream = builder.stream(rawTopic, Consumed.with(Serdes.Long(), accidentSerde))
                 .filter((k, v) -> v.getSpeciesName() != null && !v.getSpeciesName().isBlank())
                 .filter((k, v) -> v.getSpeciesQuantity()!= null && !v.getSpeciesQuantity().isBlank())
                 .map((key, value) -> {
-                    value.setSpeciesQuantity("88");
+                    switch (value.getSpeciesQuantity()) {
+                        case "2-10" -> value.setSpeciesQuantity("5");
+                        case "11-100" -> value.setSpeciesQuantity("50");
+                        case "Over 100" -> value.setSpeciesQuantity("500");
+                    }
                     return new KeyValue<>(key, value);
                 });
 
