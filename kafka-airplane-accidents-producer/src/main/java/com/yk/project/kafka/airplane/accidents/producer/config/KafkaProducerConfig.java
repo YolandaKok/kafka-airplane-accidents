@@ -70,4 +70,31 @@ public class KafkaProducerConfig {
                 .compact()
                 .build();
     }
+
+    @Bean
+    public NewTopic cleanUpTopic() {
+        return TopicBuilder
+                .name("clean-data-topic")
+                .partitions(3)
+                .replicas(2)
+                .build();
+    }
+
+    @Bean
+    public NewTopic countTopic() {
+        return TopicBuilder
+                .name("count-per-year-month-species")
+                .partitions(3)
+                .replicas(2)
+                .build();
+    }
+
+    @Bean
+    public NewTopic count2Topic() {
+        return TopicBuilder
+                .name("change-key-topic")
+                .partitions(3)
+                .replicas(2)
+                .build();
+    }
 }
