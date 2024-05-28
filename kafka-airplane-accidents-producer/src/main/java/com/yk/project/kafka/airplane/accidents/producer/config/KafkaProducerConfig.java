@@ -89,4 +89,14 @@ public class KafkaProducerConfig {
                 .compact()
                 .build();
     }
+
+    @Bean
+    public NewTopic windowTopic() {
+        return TopicBuilder
+                .name("sliding-window-result")
+                .partitions(3)
+                .replicas(2)
+                .compact()
+                .build();
+    }
 }

@@ -5,14 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yk.project.kafka.airplane.accidents.base.model.Accident;
 import com.yk.project.kafka.airplane.accidents.base.model.AccidentGroupingKey;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.serializer.JsonSerde;
+
+import java.time.Duration;
+import java.util.PriorityQueue;
 
 @Configuration
 public class StreamService {
@@ -70,6 +74,46 @@ public class StreamService {
 
         accidentStream.toStream()
                 .to("count-per-year-month-species");
+
+        return accidentStream;
+    }
+
+    @Bean
+    public KTable<Windowed<String>, Long> sumAccidents(StreamsBuilder builder) {
+        var accidentSerde = new JsonSerde<>(Accident.class);
+        var windowSerde = WindowedSerdes.timeWindowedSerdeFrom(String.class, Duration.ofDays(365).toMillis());
+
+        var accidentStream = builder.stream(cleanupTopic, Consumed.with(Serdes.Long(), accidentSerde))
+                .selectKey((k, v) -> v.getSpeciesName() + ":" + v.getIncidentYear()
+                ).groupByKey()
+                .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofDays(365)))
+                .count();
+
+        accidentStream.toStream().print(Printed.toSysOut());
+          accidentStream.toStream()
+                  .to("sliding-window-result", Produced.with(windowSerde, Serdes.Long()));
+
+        return accidentStream;
+    }
+
+
+
+//    @Bean
+    public KTable<AccidentGroupingKey, Long> groupingCount(StreamsBuilder builder) {
+        var accidentSerde = new JsonSerde<>(Accident.class);
+        var keySerde = new JsonSerde<>(AccidentGroupingKey.class);
+
+        var accidentStream = builder.stream(cleanupTopic, Consumed.with(Serdes.Long(), accidentSerde))
+                .selectKey((k, v) -> AccidentGroupingKey.builder()
+                                                .speciesName(v.getSpeciesName())
+                                                .incidentYear(v.getIncidentYear())
+                                                .incidentMonth(v.getIncidentMonth())
+                                                .build()
+                ).groupByKey()
+                .count(Materialized.with(keySerde, Serdes.Long()));
+
+        accidentStream.toStream()
+                .to("count-per-year-month-species", Produced.with(keySerde, Serdes.Long()));
 
         return accidentStream;
     }

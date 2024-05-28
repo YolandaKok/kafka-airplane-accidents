@@ -41,6 +41,7 @@ public class KafkaStreamConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, streamConsumerGroupId);
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, "8192");
+        props.put(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, EventTimestampExtractor.class);
 
         // For producer and consumer settings used internally
         // @see https://kafka.apache.org/10/documentation/streams/developer-guide/config-streams.html#kafka-consumers-and-producer-configuration-parameters
