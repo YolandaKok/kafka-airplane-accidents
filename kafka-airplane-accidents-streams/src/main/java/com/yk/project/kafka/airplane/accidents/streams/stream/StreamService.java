@@ -1,9 +1,8 @@
 package com.yk.project.kafka.airplane.accidents.streams.stream;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yk.project.kafka.airplane.accidents.base.model.Accident;
-import com.yk.project.kafka.airplane.accidents.base.model.GenericRecord;
+import com.yk.project.kafka.airplane.accidents.base.model.TopAccident;
 import com.yk.project.kafka.airplane.accidents.streams.utils.PriorityQueueSerde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
@@ -53,7 +52,7 @@ public class StreamService {
     }
 
     @Bean
-    public KTable<Windowed<String>, String> sumAccidents(StreamsBuilder builder) {
+    public KTable<Windowed<String>, List<TopAccident>> sumAccidents(StreamsBuilder builder) {
         var accidentSerde = new JsonSerde<>(Accident.class);
         var windowSerde = WindowedSerdes.timeWindowedSerdeFrom(String.class, Duration.ofDays(365).toMillis());
 
@@ -63,26 +62,29 @@ public class StreamService {
                 .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofDays(365)))
                 .count();
 
-        final Comparator<GenericRecord> comparator =
+        final Comparator<TopAccident> comparator =
                 (o1, o2) -> (int) (o2.getCount() - o1.getCount());
 
-        final KTable<Windowed<String>, PriorityQueue<GenericRecord>> allViewCounts = accidentStream
+        final KTable<Windowed<String>, PriorityQueue<TopAccident>> allViewCounts = accidentStream
                 .groupBy(
                         // the selector
                         (windowedArticle, count) -> {
+                            String speciesName = windowedArticle.key().split("@")[0];
+                            String year = windowedArticle.key().split("@")[1];
                             // project on the industry field for key
                             final Windowed<String> windowedIndustry =
-                                    new Windowed<>(windowedArticle.key().split("@")[1],
+                                    new Windowed<>(year,
                                             windowedArticle.window());
 
-                            final GenericRecord genericRecord = GenericRecord.builder()
+                            final TopAccident topAccident = TopAccident.builder()
                                     .count(count)
-                                    .name(windowedArticle.key())
+                                    .speciesName(speciesName)
+                                    .year(Integer.valueOf(year))
                                     .build();
 
-                            return new KeyValue<>(windowedIndustry, genericRecord);
+                            return new KeyValue<>(windowedIndustry, topAccident);
                         },
-                        Grouped.with(windowSerde, new JsonSerde<>(GenericRecord.class))
+                        Grouped.with(windowSerde, new JsonSerde<>(TopAccident.class))
                 ).aggregate(
                         // the initializer
                         () -> new PriorityQueue<>(comparator),
@@ -99,27 +101,27 @@ public class StreamService {
                             return queue;
                         },
 
-                        Materialized.with(windowSerde, new PriorityQueueSerde<>(comparator, new JsonSerde<>(GenericRecord.class)))
+                        Materialized.with(windowSerde, new PriorityQueueSerde<>(comparator, new JsonSerde<>(TopAccident.class)))
                 );
 
         final int topN = 5;
-        final KTable<Windowed<String>, String> topViewCounts = allViewCounts
+        final KTable<Windowed<String>, List<TopAccident>> topViewCounts = allViewCounts
                 .mapValues(queue -> {
-                    final List<String> results = new ArrayList<>();
+                    final List<TopAccident> results = new ArrayList<>();
                     for (int i = 0; i < topN; i++) {
-                        final GenericRecord record = queue.poll();
+                        final TopAccident record = queue.poll();
                         if (record == null) {
                             break;
                         }
-                        results.add(record.getCount() + "@" + record.getName());
+                        results.add(record);
                     }
-                    return String.join(",", results);
+                    return results;
                 });
 
         topViewCounts.toStream().print(Printed.toSysOut());
 
         topViewCounts.toStream().to("sliding-window-result",
-                Produced.with(windowSerde, Serdes.String()));
+                Produced.with(windowSerde, new JsonSerde<>()));
 
         return topViewCounts;
     }
