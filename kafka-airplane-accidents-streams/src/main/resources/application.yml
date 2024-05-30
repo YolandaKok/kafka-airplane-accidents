@@ -11,3 +11,6 @@ app:
     topics:
       raw: raw-data-topic
       cleanup: clean-data-topic
+
+server:
+  port: 8081

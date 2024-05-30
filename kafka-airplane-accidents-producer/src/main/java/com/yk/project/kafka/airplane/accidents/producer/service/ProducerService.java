@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class ProducerService {
@@ -31,9 +32,18 @@ public class ProducerService {
     @PostConstruct
     public void produceAccidentRawRecords() {
         List<Accident> accidents = csvParser.readFile(path);
+        System.out.println("Accidents: " + accidents.size());
         accidents.forEach(
-                accident -> kafkaProducer
-                        .sendMessageWithKeyAsync(rawTopic, accident.getRecordId(), accident)
+                accident -> {
+                    try {
+                        kafkaProducer
+                                .sendMessageWithKeyAsync(rawTopic, accident.getRecordId(), accident);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
         );
     }
 }
