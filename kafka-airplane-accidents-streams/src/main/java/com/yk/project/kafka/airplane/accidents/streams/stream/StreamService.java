@@ -3,7 +3,6 @@ package com.yk.project.kafka.airplane.accidents.streams.stream;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yk.project.kafka.airplane.accidents.base.model.Accident;
-import com.yk.project.kafka.airplane.accidents.base.model.AccidentGroupingKey;
 import com.yk.project.kafka.airplane.accidents.base.model.GenericRecord;
 import com.yk.project.kafka.airplane.accidents.streams.utils.PriorityQueueSerde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -49,36 +48,8 @@ public class StreamService {
                 });
 
         cleanUpStream.to(cleanupTopic, Produced.with(Serdes.Long(), accidentSerde));
-//        cleanUpStream.print(Printed.toSysOut());
 
         return cleanUpStream;
-    }
-
-//    @Bean
-    public KTable<String, Long> streamAccidentsGroupByYearMonthAndSpecies(StreamsBuilder builder) {
-        var accidentSerde = new JsonSerde<>(Accident.class);
-
-        var accidentStream = builder.stream(cleanupTopic, Consumed.with(Serdes.Long(), accidentSerde))
-        .selectKey((k, v) ->
-                {
-                    try {
-                        return objectMapper.writeValueAsString(
-                                AccidentGroupingKey.builder()
-                                        .speciesName(v.getSpeciesName())
-                                        .incidentYear(v.getIncidentYear())
-                                        .incidentMonth(v.getIncidentMonth())
-                                        .build()
-                        );
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        ).groupByKey().count();
-
-        accidentStream.toStream()
-                .to("count-per-year-month-species");
-
-        return accidentStream;
     }
 
     @Bean
@@ -150,29 +121,6 @@ public class StreamService {
         topViewCounts.toStream().to("sliding-window-result",
                 Produced.with(windowSerde, Serdes.String()));
 
-        topViewCounts.toStream()
-                .toTable(Named.as("sliding-window-result"));
-
         return topViewCounts;
-    }
-
-//    @Bean
-    public KTable<AccidentGroupingKey, Long> groupingCount(StreamsBuilder builder) {
-        var accidentSerde = new JsonSerde<>(Accident.class);
-        var keySerde = new JsonSerde<>(AccidentGroupingKey.class);
-
-        var accidentStream = builder.stream(cleanupTopic, Consumed.with(Serdes.Long(), accidentSerde))
-                .selectKey((k, v) -> AccidentGroupingKey.builder()
-                                                .speciesName(v.getSpeciesName())
-                                                .incidentYear(v.getIncidentYear())
-                                                .incidentMonth(v.getIncidentMonth())
-                                                .build()
-                ).groupByKey()
-                .count(Materialized.with(keySerde, Serdes.Long()));
-
-        accidentStream.toStream()
-                .to("count-per-year-month-species", Produced.with(keySerde, Serdes.Long()));
-
-        return accidentStream;
     }
 }
