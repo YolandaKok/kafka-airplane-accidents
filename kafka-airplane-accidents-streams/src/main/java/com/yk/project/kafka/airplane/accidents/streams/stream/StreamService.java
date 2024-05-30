@@ -113,6 +113,7 @@ public class StreamService {
                         if (record == null) {
                             break;
                         }
+                        record.setRanking(i);
                         results.add(record);
                     }
                     return results;

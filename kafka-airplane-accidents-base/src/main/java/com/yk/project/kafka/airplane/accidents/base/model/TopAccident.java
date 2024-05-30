@@ -8,6 +8,7 @@ import lombok.*;
 @Data
 @ToString
 public class TopAccident {
+    private Integer ranking;
     private Integer year;
     private String speciesName;
     private Long count;
