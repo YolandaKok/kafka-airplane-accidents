@@ -38,6 +38,17 @@ services:
       DYNAMIC_CONFIG_ENABLED: 'true'
       KAFKA_CLUSTERS_0_NAME: kafkacluster
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka-node1:9092,kafka-node2:9092,kafka-node3:9092'
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - cache:/data
+volumes:
+  cache:
+    driver: local
 networks:
   kafka-net:
     driver: bridge
