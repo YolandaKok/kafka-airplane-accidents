@@ -2,6 +2,7 @@ package com.yk.project.kafka.airplane.accidents.consumer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -10,12 +11,7 @@ public class RedisConfiguration {
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
-        JedisConnectionFactory jedisConFactory
-                = new JedisConnectionFactory();
-        jedisConFactory.setHostName("localhost");
-        jedisConFactory.setPort(6379);
-        jedisConFactory.setPassword("eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81");
-        return jedisConFactory;
+        return new JedisConnectionFactory();
     }
 
     @Bean

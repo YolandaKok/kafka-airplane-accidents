@@ -76,23 +76,14 @@ public class KafkaProducerConfig {
                 .name("clean-data-topic")
                 .partitions(3)
                 .replicas(2)
-                .build();
-    }
-
-    @Bean
-    public NewTopic countTopic() {
-        return TopicBuilder
-                .name("count-per-year-month-species")
-                .partitions(3)
-                .replicas(2)
-                .compact()
+                .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
                 .build();
     }
 
     @Bean
     public NewTopic windowTopic() {
         Map<String, String> configs =
-                Map.of(TopicConfig.RETENTION_MS_CONFIG, "10000",
+                Map.of(TopicConfig.RETENTION_MS_CONFIG, "180000",
                         TopicConfig.DELETE_RETENTION_MS_CONFIG, "100",
                         TopicConfig.SEGMENT_MS_CONFIG, "100");
         return TopicBuilder
@@ -100,6 +91,7 @@ public class KafkaProducerConfig {
                 .partitions(3)
                 .replicas(2)
                 .compact()
+                .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
                 .configs(configs)
                 .build();
     }

@@ -1,7 +1,9 @@
 package com.yk.project.kafka.airplane.accidents.streams.config;
 
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.TopicConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.state.KeyValueStore;
@@ -14,8 +16,10 @@ import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.apache.kafka.streams.KafkaStreams;
+import org.springframework.kafka.config.TopicBuilder;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableKafkaStreams

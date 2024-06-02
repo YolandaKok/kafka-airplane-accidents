@@ -14,3 +14,9 @@ app:
 
 server:
   port: 8081
+
+logging:
+  path: /temp/log                  # path for a logging file.
+  file: tracefile.log              # Log file name.
+  level:
+    org.springframework: DEBUG # Log levels severity mapping.

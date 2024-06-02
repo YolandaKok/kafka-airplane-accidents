@@ -33,11 +33,15 @@ public class ProducerService {
     public void produceAccidentRawRecords() {
         List<Accident> accidents = csvParser.readFile(path);
         System.out.println("Accidents: " + accidents.size());
+        var res = accidents.stream().filter(x -> x.getSpeciesName() != null)
+                .filter(x -> x.getSpeciesName().equals("UNKNOWN SMALL BIRD") && x.getIncidentYear() == 2015)
+                        .count();
+        System.out.println("RESULT: " + res);
         accidents.forEach(
                 accident -> {
                     try {
                         kafkaProducer
-                                .sendMessageWithKeyAsync(rawTopic, accident.getRecordId(), accident);
+                                .sendMessageWithKeySync(rawTopic, accident.getRecordId(), accident);
                     } catch (ExecutionException e) {
                         throw new RuntimeException(e);
                     } catch (InterruptedException e) {

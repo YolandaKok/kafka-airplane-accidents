@@ -16,7 +16,7 @@ public class KafkaProducer {
     @Autowired
     private final KafkaTemplate<Long, Object> kafkaTemplate;
 
-    public void sendMessageWithKeyAsync(final String topic, final Long key, final Object value) throws ExecutionException, InterruptedException {
+    public void sendMessageWithKeySync(final String topic, final Long key, final Object value) throws ExecutionException, InterruptedException {
         kafkaTemplate.send(topic, key, value).get();
     }
 }

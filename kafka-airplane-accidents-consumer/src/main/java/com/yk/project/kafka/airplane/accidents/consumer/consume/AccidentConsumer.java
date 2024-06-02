@@ -14,6 +14,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
@@ -25,20 +26,21 @@ public class AccidentConsumer {
 
     private final AccidentResultRepository accidentResultRepository;
 
-    @KafkaListener(topics = "${app.kafka.topics.accidents.topN}", groupId = "con", concurrency = "1",
+    @KafkaListener(topics = "${app.kafka.topics.accidents.topN}", groupId = "con-2", concurrency = "5",
             containerFactory = "multiTypeKafkaListenerContainerFactory")
     public void listen(ConsumerRecord<String, String> consumerRecord) throws JsonProcessingException {
         List<TopAccident> topAccidents = objectMapper
                 .readValue(consumerRecord.value(), new TypeReference<>(){});
 
-        topAccidents.forEach(
-                item -> accidentResultRepository
-                        .save(AccidentResult.builder()
+        List<AccidentResult> results = topAccidents.stream().map(
+                item -> AccidentResult.builder()
                                 .count(item.getCount())
                                 .speciesName(item.getSpeciesName())
                                 .id(item.getYear() + ":" + item.getRanking())
                                 .build()
-                        )
-        );
+        ).toList();
+
+        accidentResultRepository
+                .saveAll(results);
     }
 }

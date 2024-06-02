@@ -29,14 +29,13 @@ public class StreamService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Bean
+//    @Bean
     public KStream<Long, Accident> streamFilterEmptySpeciesNameAndQuantity(StreamsBuilder builder) {
         var accidentSerde = new JsonSerde<>(Accident.class);
 
         var cleanUpStream = builder.stream(rawTopic, Consumed.with(Serdes.Long(), accidentSerde))
-                .filter((k, v) -> v.getRecordId() != null)
                 .filter((k, v) -> v.getSpeciesName() != null && !v.getSpeciesName().isBlank())
-                .filter((k, v) -> v.getSpeciesQuantity()!= null && !v.getSpeciesQuantity().isBlank())
+                .filter((k, v) -> v.getSpeciesQuantity() != null && !v.getSpeciesQuantity().isBlank())
                 .map((key, value) -> {
                     switch (value.getSpeciesQuantity()) {
                         case "2-10" -> value.setSpeciesQuantity("5");
@@ -56,7 +55,7 @@ public class StreamService {
         var accidentSerde = new JsonSerde<>(Accident.class);
         var windowSerde = WindowedSerdes.timeWindowedSerdeFrom(String.class, Duration.ofDays(365).toMillis());
 
-        var accidentStream = builder.stream(cleanupTopic, Consumed.with(Serdes.Long(), accidentSerde))
+        var accidentStream = builder.stream(rawTopic, Consumed.with(Serdes.Long(), accidentSerde))
                 .selectKey((k, v) -> v.getSpeciesName() + "@" + v.getIncidentYear()
                 ).groupByKey()
                 .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofDays(365)))
@@ -71,7 +70,6 @@ public class StreamService {
                         (windowedArticle, count) -> {
                             String speciesName = windowedArticle.key().split("@")[0];
                             String year = windowedArticle.key().split("@")[1];
-                            // project on the industry field for key
                             final Windowed<String> windowedIndustry =
                                     new Windowed<>(year,
                                             windowedArticle.window());
@@ -126,4 +124,20 @@ public class StreamService {
 
         return topViewCounts;
     }
+
+//    @Bean
+//    public KTable<Windowed<String>, Long> sumAccidents2(StreamsBuilder builder) {
+//        var accidentSerde = new JsonSerde<>(Accident.class);
+//        var windowSerde = WindowedSerdes.timeWindowedSerdeFrom(String.class, Duration.ofDays(365).toMillis());
+//
+//        var accidentStream = builder.stream(cleanupTopic, Consumed.with(Serdes.Long(), accidentSerde))
+//                .selectKey((k, v) -> v.getSpeciesName() + "@" + v.getIncidentYear()
+//                ).groupByKey()
+//                .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofDays(365)))
+//                .count();
+//
+//        accidentStream.toStream().to("sliding-window-result", Produced.with(windowSerde, Serdes.Long()));
+//
+//        return accidentStream;
+//    }
 }
