@@ -26,7 +26,7 @@ public class AccidentConsumer {
 
     private final AccidentResultRepository accidentResultRepository;
 
-    @KafkaListener(topics = "${app.kafka.topics.accidents.topN}", groupId = "con-2", concurrency = "5",
+    @KafkaListener(topics = "${app.kafka.topics.accidents.topN}", groupId = "con-5", concurrency = "5",
             containerFactory = "multiTypeKafkaListenerContainerFactory")
     public void listen(ConsumerRecord<String, String> consumerRecord) throws JsonProcessingException {
         List<TopAccident> topAccidents = objectMapper

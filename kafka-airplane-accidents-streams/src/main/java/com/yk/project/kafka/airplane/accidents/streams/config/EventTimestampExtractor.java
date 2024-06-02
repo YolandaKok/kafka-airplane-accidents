@@ -22,10 +22,9 @@ public class EventTimestampExtractor implements TimestampExtractor {
         final Accident event = (Accident) consumerRecord.value();
         final ZonedDateTime eventCreationTime = ZonedDateTime
                 .of(event.getIncidentYear(), 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
-        final long timestamp = eventCreationTime.toInstant().toEpochMilli();
 
-        log.info("Event ({}) yielded timestamp: {}", event.getRecordId(), timestamp);
+//        log.info("Event ({}) yielded timestamp: {}", event.getRecordId(), timestamp);
 
-        return timestamp;
+        return eventCreationTime.toInstant().toEpochMilli();
     }
 }

@@ -38,6 +38,7 @@ public class KafkaStreamConfig {
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
+        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, "2000");
         props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
         //		props.put(StreamsConfig.ROCKSDB_CONFIG_SETTER_CLASS_CONFIG, CustomRocksDBConfig.class);
         props.put(StreamsConfig.REPLICATION_FACTOR_CONFIG, 3);
@@ -48,12 +49,36 @@ public class KafkaStreamConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, streamConsumerGroupId);
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         props.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, "8192");
-        props.put(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, EventTimestampExtractor.class);
-        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 10 * 100);
 
         // For producer and consumer settings used internally
         // @see https://kafka.apache.org/10/documentation/streams/developer-guide/config-streams.html#kafka-consumers-and-producer-configuration-parameters
 
         return new KafkaStreamsConfiguration(props);
+    }
+
+    @Bean
+    public NewTopic cleanUpTopic() {
+        return TopicBuilder
+                .name("clean-data-topic")
+                .partitions(3)
+                .replicas(2)
+                .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
+                .build();
+    }
+
+    @Bean
+    public NewTopic windowTopic() {
+        Map<String, String> configs =
+                Map.of(TopicConfig.RETENTION_MS_CONFIG, "2000",
+                        TopicConfig.DELETE_RETENTION_MS_CONFIG, "1000",
+                        TopicConfig.SEGMENT_MS_CONFIG, "1000");
+        return TopicBuilder
+                .name("sliding-window-result")
+                .partitions(3)
+                .replicas(2)
+                .compact()
+                .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
+                .configs(configs)
+                .build();
     }
 }

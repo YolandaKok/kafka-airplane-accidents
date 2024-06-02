@@ -37,6 +37,11 @@ public class ProducerService {
                 .filter(x -> x.getSpeciesName().equals("UNKNOWN SMALL BIRD") && x.getIncidentYear() == 2015)
                         .count();
         System.out.println("RESULT: " + res);
+        var res1 = accidents.stream()
+                .filter(x -> x.getSpeciesName() != null && !x.getSpeciesName().isEmpty())
+                .filter(x -> x.getSpeciesQuantity() != null && !x.getSpeciesQuantity().isEmpty())
+                .count();
+        System.out.println("Clean result: " + res1);
         accidents.forEach(
                 accident -> {
                     try {

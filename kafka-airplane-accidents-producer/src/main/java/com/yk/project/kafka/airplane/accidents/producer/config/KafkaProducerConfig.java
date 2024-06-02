@@ -69,30 +69,4 @@ public class KafkaProducerConfig {
                 .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
                 .build();
     }
-
-    @Bean
-    public NewTopic cleanUpTopic() {
-        return TopicBuilder
-                .name("clean-data-topic")
-                .partitions(3)
-                .replicas(2)
-                .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
-                .build();
-    }
-
-    @Bean
-    public NewTopic windowTopic() {
-        Map<String, String> configs =
-                Map.of(TopicConfig.RETENTION_MS_CONFIG, "180000",
-                        TopicConfig.DELETE_RETENTION_MS_CONFIG, "100",
-                        TopicConfig.SEGMENT_MS_CONFIG, "100");
-        return TopicBuilder
-                .name("sliding-window-result")
-                .partitions(3)
-                .replicas(2)
-                .compact()
-                .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
-                .configs(configs)
-                .build();
-    }
 }
