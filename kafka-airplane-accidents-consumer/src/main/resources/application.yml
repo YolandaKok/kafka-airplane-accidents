@@ -1,3 +1,6 @@
+server:
+  port: 9090
+
 spring:
   application:
     name: kafka-airplane-accidents-consumer
@@ -14,3 +17,8 @@ app:
     topics:
       accidents:
         topN: sliding-window-result
+
+csv:
+  export:
+    file:
+      path: /Users/yolanda/topN_accidents.csv
