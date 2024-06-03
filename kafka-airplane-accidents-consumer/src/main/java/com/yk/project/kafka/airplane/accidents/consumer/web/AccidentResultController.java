@@ -28,12 +28,12 @@ public class AccidentResultController {
         this.accidentMapper = accidentMapper;
     }
 
-    @GetMapping
+    @GetMapping("/export")
     public List<AccidentResult> getResults() {
         var results = accidentMapper.assembleAll(accidentService.findAll());
         new CsvRoutines()
                 .writeAll(results, AccidentDto.class,
-                        new File(csvExportFilePath));
+                        new File(csvExportFilePath), "year","ranking","speciesName","count");
 
         return accidentService.findAll();
     }
