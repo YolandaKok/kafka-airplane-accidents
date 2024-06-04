@@ -69,9 +69,9 @@ public class KafkaStreamConfig {
     @Bean
     public NewTopic windowTopic() {
         Map<String, String> configs =
-                Map.of(TopicConfig.RETENTION_MS_CONFIG, "2000",
-                        TopicConfig.DELETE_RETENTION_MS_CONFIG, "1000",
-                        TopicConfig.SEGMENT_MS_CONFIG, "1000");
+                Map.of(TopicConfig.RETENTION_MS_CONFIG, "1000",
+                        TopicConfig.DELETE_RETENTION_MS_CONFIG, "100",
+                        TopicConfig.SEGMENT_MS_CONFIG, "100");
         return TopicBuilder
                 .name("sliding-window-result")
                 .partitions(3)
