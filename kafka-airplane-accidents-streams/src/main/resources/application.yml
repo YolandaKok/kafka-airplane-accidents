@@ -1,0 +1,22 @@
+spring:
+  kafka:
+    bootstrap-servers: 127.0.0.1:19092,127.0.0.1:29092,127.0.0.1:39092
+    consumer:
+      group-id: kafka-accidents-stream
+  threads:
+    virtual:
+      enabled: true
+app:
+  kafka:
+    topics:
+      raw: raw-data-topic
+      cleanup: clean-data-topic
+
+server:
+  port: 8081
+
+logging:
+  path: /temp/log                  # path for a logging file.
+  file: tracefile.log              # Log file name.
+  level:
+    org.springframework: DEBUG # Log levels severity mapping.

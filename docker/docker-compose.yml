@@ -1,0 +1,54 @@
+services:
+  kafka-node1:
+    container_name: kafka-node1
+    image: demo-kraft-kafka:latest
+    ports:
+      - "19092:19092"
+    networks:
+      - kafka-net
+    volumes:
+      - ./config/kafka-node1/server.properties:/opt/kafka/config/kraft/server.properties
+  kafka-node2:
+    container_name: kafka-node2
+    image: demo-kraft-kafka:latest
+    ports:
+      - "29092:29092"
+    networks:
+      - kafka-net
+    volumes:
+      - ./config/kafka-node2/server.properties:/opt/kafka/config/kraft/server.properties
+  kafka-node3:
+    container_name: kafka-node3
+    image: demo-kraft-kafka:latest
+    ports:
+      - "39092:39092"
+    networks:
+      - kafka-net
+    volumes:
+      - ./config/kafka-node3/server.properties:/opt/kafka/config/kraft/server.properties
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    hostname: kafka-ui
+    container_name: kafka_ui
+    ports:
+      - "8080:8080"
+    networks:
+      - kafka-net
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: kafkacluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka-node1:9092,kafka-node2:9092,kafka-node3:9092'
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
+volumes:
+  cache:
+    driver: local
+networks:
+  kafka-net:
+    driver: bridge
