@@ -2,6 +2,7 @@ package com.yk.project.kafka.airplane.accidents.base.csvparser;
 
 import com.univocity.parsers.common.processor.BeanListProcessor;
 import com.univocity.parsers.csv.CsvParserSettings;
+import com.univocity.parsers.csv.CsvRoutines;
 import com.yk.project.kafka.airplane.accidents.base.model.Accident;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,5 +33,11 @@ public class CsvParser<T> {
             log.error("Error while parsing file: {} and class type: {}", path, typeParameterClass);
         }
         return null;
+    }
+
+    public void writeToFile(List<T> results, String csvExportFilePath, String... headers) {
+        CsvRoutines csvRoutines = new CsvRoutines();
+                csvRoutines.writeAll(results, typeParameterClass,
+                        new File(csvExportFilePath), headers);
     }
 }

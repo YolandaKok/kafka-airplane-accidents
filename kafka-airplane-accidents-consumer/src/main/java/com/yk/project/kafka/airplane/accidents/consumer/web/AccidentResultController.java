@@ -2,6 +2,8 @@ package com.yk.project.kafka.airplane.accidents.consumer.web;
 
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvRoutines;
+import com.yk.project.kafka.airplane.accidents.base.csvparser.CsvParser;
+import com.yk.project.kafka.airplane.accidents.base.model.Accident;
 import com.yk.project.kafka.airplane.accidents.consumer.mapper.AccidentMapper;
 import com.yk.project.kafka.airplane.accidents.consumer.model.AccidentDto;
 import com.yk.project.kafka.airplane.accidents.consumer.model.AccidentResult;
@@ -20,7 +22,11 @@ import java.util.List;
 public class AccidentResultController {
     @Value("${csv.export.file.path}")
     private String csvExportFilePath;
+
+    private final CsvParser<AccidentDto> csvParser = new CsvParser<>(AccidentDto.class);
+
     private final AccidentService accidentService;
+
     private final AccidentMapper accidentMapper;
 
     public AccidentResultController(AccidentService accidentService, AccidentMapper accidentMapper) {
@@ -31,9 +37,8 @@ public class AccidentResultController {
     @GetMapping("/export")
     public List<AccidentResult> getResults() {
         var results = accidentMapper.assembleAll(accidentService.findAll());
-        new CsvRoutines()
-                .writeAll(results, AccidentDto.class,
-                        new File(csvExportFilePath), "year","ranking","speciesName","count");
+        csvParser
+                .writeToFile(results, csvExportFilePath, "year","ranking", "speciesName", "count");
 
         return accidentService.findAll();
     }
