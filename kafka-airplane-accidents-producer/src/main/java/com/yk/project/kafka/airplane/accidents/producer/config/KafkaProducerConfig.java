@@ -67,7 +67,6 @@ public class KafkaProducerConfig {
                 .partitions(3)
                 .replicas(2)
                 .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
-                .compact()
                 .build();
     }
 }

@@ -25,6 +25,8 @@
     <modules>
         <module>kafka-airplane-accidents-base</module>
         <module>kafka-airplane-accidents-producer</module>
+        <module>kafka-airplane-accidents-streams</module>
+        <module>kafka-airplane-accidents-consumer</module>
     </modules>
 
     <dependencyManagement>
