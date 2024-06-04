@@ -35,11 +35,9 @@ public class AccidentResultController {
     }
 
     @GetMapping("/export")
-    public List<AccidentResult> getResults() {
+    public void getResults() {
         var results = accidentMapper.assembleAll(accidentService.findAll());
         csvParser
                 .writeToFile(results, csvExportFilePath, "year","ranking", "speciesName", "count");
-
-        return accidentService.findAll();
     }
 }
