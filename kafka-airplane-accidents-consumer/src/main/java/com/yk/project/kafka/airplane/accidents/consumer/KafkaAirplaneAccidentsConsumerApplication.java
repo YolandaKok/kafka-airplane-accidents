@@ -10,8 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 public class KafkaAirplaneAccidentsConsumerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(KafkaAirplaneAccidentsConsumerApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(KafkaAirplaneAccidentsConsumerApplication.class, args);
+  }
 }

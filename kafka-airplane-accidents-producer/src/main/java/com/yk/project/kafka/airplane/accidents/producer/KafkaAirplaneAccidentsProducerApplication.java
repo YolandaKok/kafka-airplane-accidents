@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class KafkaAirplaneAccidentsProducerApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(KafkaAirplaneAccidentsProducerApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(KafkaAirplaneAccidentsProducerApplication.class, args);
+  }
 }

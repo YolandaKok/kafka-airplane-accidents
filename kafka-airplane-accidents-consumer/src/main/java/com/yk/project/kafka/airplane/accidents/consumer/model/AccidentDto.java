@@ -9,12 +9,8 @@ import lombok.Data;
 @Data
 @Builder
 public class AccidentDto {
-    @Parsed
-    private Integer year;
-    @Parsed
-    private Integer ranking;
-    @Parsed
-    private String speciesName;
-    @Parsed
-    private Long count;
+  @Parsed private Integer year;
+  @Parsed private Integer ranking;
+  @Parsed private String speciesName;
+  @Parsed private Long count;
 }
