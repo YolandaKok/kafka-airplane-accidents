@@ -9,20 +9,18 @@ import java.util.List;
 
 @Component
 public class AccidentMapper implements Assembler<AccidentDto, AccidentResult> {
-    @Override
-    public AccidentDto assemble(AccidentResult item) {
-        return AccidentDto.builder()
-                .year(Integer.valueOf(item.getId().split(":")[0]))
-                .ranking(Integer.parseInt(item.getId().split(":")[1]) + 1)
-                .count(item.getCount())
-                .speciesName(item.getSpeciesName())
-                .build();
-    }
+  @Override
+  public AccidentDto assemble(AccidentResult item) {
+    return AccidentDto.builder()
+        .year(Integer.valueOf(item.getId().split(":")[0]))
+        .ranking(Integer.parseInt(item.getId().split(":")[1]) + 1)
+        .count(item.getCount())
+        .speciesName(item.getSpeciesName())
+        .build();
+  }
 
-    @Override
-    public List<AccidentDto> assembleAll(List<AccidentResult> items) {
-        return items.stream().map(
-                this::assemble
-        ).toList();
-    }
+  @Override
+  public List<AccidentDto> assembleAll(List<AccidentResult> items) {
+    return items.stream().map(this::assemble).toList();
+  }
 }
