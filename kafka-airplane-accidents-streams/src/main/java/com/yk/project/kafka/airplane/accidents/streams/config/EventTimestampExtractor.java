@@ -23,8 +23,6 @@ public class EventTimestampExtractor implements TimestampExtractor {
         final ZonedDateTime eventCreationTime = ZonedDateTime
                 .of(event.getIncidentYear(), 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
 
-//        log.info("Event ({}) yielded timestamp: {}", event.getRecordId(), timestamp);
-
         return eventCreationTime.toInstant().toEpochMilli();
     }
 }
