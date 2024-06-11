@@ -20,53 +20,52 @@ import java.util.Map;
 
 @Configuration
 public class KafkaProducerConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
+  @Value("${spring.kafka.bootstrap-servers}")
+  private String bootstrapServers;
 
-    @Value("${app.kafka.topics.raw}")
-    private String rawTopic;
+  @Value("${app.kafka.topics.raw}")
+  private String rawTopic;
 
-    @Bean
-    public KafkaAdmin generateKafkaAdmin() {
-        Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        configs.put(AdminClientConfig.CLIENT_ID_CONFIG, "local-admin-1");
-        return new KafkaAdmin(configs);
-    }
+  @Bean
+  public KafkaAdmin generateKafkaAdmin() {
+    Map<String, Object> configs = new HashMap<>();
+    configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+    configs.put(AdminClientConfig.CLIENT_ID_CONFIG, "local-admin-1");
+    return new KafkaAdmin(configs);
+  }
 
-    @Bean
-    public KafkaTemplate<Long, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
-    }
+  @Bean
+  public KafkaTemplate<Long, Object> kafkaTemplate() {
+    return new KafkaTemplate<>(producerFactory());
+  }
 
-    private ProducerFactory<Long, Object> producerFactory() {
-        var configProperties = getDefaultConfigurationProperties();
-        return new DefaultKafkaProducerFactory<>(configProperties);
-    }
+  private ProducerFactory<Long, Object> producerFactory() {
+    var configProperties = getDefaultConfigurationProperties();
+    return new DefaultKafkaProducerFactory<>(configProperties);
+  }
 
-    private Map<String, Object> getDefaultConfigurationProperties() {
-        Map<String, Object> configProperties = new HashMap<>();
-        configProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        configProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
-        configProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        configProperties.put(ProducerConfig.BATCH_SIZE_CONFIG, "16384");
-        configProperties.put(ProducerConfig.LINGER_MS_CONFIG, "0");
-        configProperties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "30000");
-        configProperties.put(ProducerConfig.ACKS_CONFIG, "all");
-        configProperties.put(ProducerConfig.CLIENT_ID_CONFIG, "accidents-producer");
-        configProperties.put(ProducerConfig.RETRIES_CONFIG, "3");
-        configProperties.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, "true");
+  private Map<String, Object> getDefaultConfigurationProperties() {
+    Map<String, Object> configProperties = new HashMap<>();
+    configProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+    configProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
+    configProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+    configProperties.put(ProducerConfig.BATCH_SIZE_CONFIG, "16384");
+    configProperties.put(ProducerConfig.LINGER_MS_CONFIG, "0");
+    configProperties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, "30000");
+    configProperties.put(ProducerConfig.ACKS_CONFIG, "all");
+    configProperties.put(ProducerConfig.CLIENT_ID_CONFIG, "accidents-producer");
+    configProperties.put(ProducerConfig.RETRIES_CONFIG, "3");
+    configProperties.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, "true");
 
-        return configProperties;
-    }
+    return configProperties;
+  }
 
-    @Bean
-    public NewTopic rawTopic() {
-        return TopicBuilder
-                .name(rawTopic)
-                .partitions(3)
-                .replicas(2)
-                .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
-                .build();
-    }
+  @Bean
+  public NewTopic rawTopic() {
+    return TopicBuilder.name(rawTopic)
+        .partitions(3)
+        .replicas(2)
+        .config(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2")
+        .build();
+  }
 }

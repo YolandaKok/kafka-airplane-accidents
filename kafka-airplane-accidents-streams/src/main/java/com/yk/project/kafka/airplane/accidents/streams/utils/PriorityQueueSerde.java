@@ -29,8 +29,10 @@ public class PriorityQueueSerde<T> implements Serde<PriorityQueue<T>> {
   private final Serde<PriorityQueue<T>> inner;
 
   public PriorityQueueSerde(final Comparator<T> comparator, final Serde<T> avroSerde) {
-    inner = Serdes.serdeFrom(new PriorityQueueSerializer<>(comparator, avroSerde.serializer()),
-                             new PriorityQueueDeserializer<>(comparator, avroSerde.deserializer()));
+    inner =
+        Serdes.serdeFrom(
+            new PriorityQueueSerializer<>(comparator, avroSerde.serializer()),
+            new PriorityQueueDeserializer<>(comparator, avroSerde.deserializer()));
   }
 
   @Override
@@ -54,5 +56,4 @@ public class PriorityQueueSerde<T> implements Serde<PriorityQueue<T>> {
     inner.serializer().close();
     inner.deserializer().close();
   }
-
 }
