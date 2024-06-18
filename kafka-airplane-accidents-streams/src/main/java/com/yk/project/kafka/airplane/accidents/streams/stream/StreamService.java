@@ -27,6 +27,9 @@ public class StreamService {
   @Value("${app.kafka.topics.cleanup}")
   private String cleanupTopic;
 
+  @Value("${app.kafka.topics.result}")
+  private String windowedResultTopic;
+
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Bean
@@ -126,7 +129,7 @@ public class StreamService {
 
     topViewCounts
         .toStream()
-        .to("sliding-window-result", Produced.with(windowSerde, new JsonSerde<>()));
+        .to(windowedResultTopic, Produced.with(windowSerde, new JsonSerde<>()));
 
     return topViewCounts;
   }
