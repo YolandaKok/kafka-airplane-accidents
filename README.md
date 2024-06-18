@@ -42,3 +42,20 @@ Trigger the export endpoint:
 curl -HGET localhost:9090/results/export
 ```
 
+### Services Description
+
+#### Producer Service
+The producer service is reading a csv file, and it's producing JSON messages that are being written into
+```raw-data-topic``` in a synchronous way.
+
+#### Kafka Streams Service
+The kafka streams service is reading data from the ```raw-data-topic``` and is transforming them by
+using some rules. The result of that data cleaning process is being written into ```clean-data-topic```.
+The kafka streams topology reads the data from the ```clean-data-topic``` and by using a priority queue is
+selecting the N top elements for each year of the incoming data and writes the result into ```sliding-window-result```
+topic.
+
+#### Consumer Service
+The consumer service reads data from the ```sliding-window-topic``` and stores them into a redis cache.
+By calling the ```/results/export``` endpoint an export of the ```top5``` results is being created. The cache service 
+is being used because the stream is unbounded, and we want to see the live results when we call the above endpoint.
