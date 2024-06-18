@@ -55,6 +55,9 @@ The kafka streams topology reads the data from the ```clean-data-topic``` and by
 selecting the N top elements for each year of the incoming data and writes the result into ```sliding-window-result```
 topic.
 
+Note: <b>PriorityQueueDeserializer, PriorityQueueSerde, PriorityQueueSerializer</b>
+implementation can be found here: https://github.com/confluentinc/kafka-streams-examples/tree/7.1.1-post
+
 #### Consumer Service
 The consumer service reads data from the ```sliding-window-topic``` and stores them into a redis cache.
 By calling the ```/results/export``` endpoint an export of the ```top5``` results is being created. The cache service 
